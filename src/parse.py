@@ -23,19 +23,15 @@ def bdd_file_parse(f):
         nodes.add(en[1])
     n = len(nodes)
     k = math.ceil(math.log(n, 2))
-    print(n, k)
 
     # Convert each number to binary
     expr_var_names = ["v{}".format(i) for i in range(2 * k)] # for two nodes
     edge_expressions = list(map(lambda x: edge_expr(x, k, expr_var_names), \
         edge_nodes))
-    print(edge_expressions)
 
     # Connect all the expressions and create a bdd
     rr = None
     for r in edge_expressions:
-
-        # Update BDD
         if rr is None: rr = expr2bdd(r)
         else: rr = rr | expr2bdd(r)
 

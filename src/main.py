@@ -18,15 +18,19 @@ from parse import bdd_file_parse
 from reach import five_step_reach
 
 def main():
-    """ Driver function: must call with "main.py [some_bdd_file]" """
+    """
+    Driver function: must call with the following syntax:
+    "./main.py [some_bdd_file_path]"
+    """
 
     # Handle incoming BDD file, constructing if there
     if len(sys.argv) < 2: raise TypeError("No BDD graph file passed!")
     rr, k = bdd_file_parse(sys.argv[1])
 
     # See if given vertices are reachable in five steps
-    reachable = five_step_reach(rr, 1, 0, k)
-    print(reachable)
+    target_vertices = (3, 1)
+    reachable = five_step_reach(rr, *target_vertices, k)
+    print(target_vertices, reachable)
 
 # Let's go
 main()

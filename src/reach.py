@@ -9,68 +9,57 @@ def five_step_reach(rr, a, b, k):
     with the given BDD
     """
 
-    # TODO: Generalize to 5-step
-    # TODO: Auto-generate 1024 node BDD
-
-    # TODO: Have more xx1, xx2, ... for length of k
-
+    # NOTE: Created this so you can vary the number of steps dynamically
+    num_steps = 5
     var_base = 0
     var_coll = []
-    num_steps = 2
 
-    # Get start and end expressions covered
-    var_set_start = [bddvar("b{}".format(i + var_base)) for i in range(k)]
-    var_base += k
-    var_set_end = [bddvar("b{}".format(i + var_base)) for i in range(k)]
+    # Get start expression covered
+    var_set_start = [bddvar("v{}".format(i + var_base)) for i in range(k)]
     var_base += k
     var_coll.append(var_set_start)
-    var_coll.append(var_set_end)
+    inter_set = set()
 
     # Now cover all intermediate
     for s in range(num_steps - 1):
-
-        var_set = [bddvar("b{}".format(i + var_base)) for i in range(k)]
+        var_set = [bddvar("v{}".format(i + var_base)) for i in range(k)]
         var_base += k
-
         var_coll.append(var_set)
+        for v in var_set: inter_set.add(v)
 
-    # Two step reachability
-    for
-    hh = rr.compose({yy1:zz1, yy2:zz2}) & rr.compose({xx1:zz1, xx2:zz2})
-    hh = hh.smoothing({zz1, zz2})
+    # End expression
+    var_set_end = [bddvar("v{}".format(i + var_base)) for i in range(k)]
+    var_coll.append(var_set_end)
 
-    a_bin = to_bin(a, k)
-    b_bin = to_bin(b, k)
+    # Variable-step reachability via composition
+    hh = None
+    past_var = None
+    for curr_var in var_coll:
 
-    restrict_dict = {c:d for c, d in zip(var_set_start, a_bin)}
-    restrict_dict.update({c:d for c, d in zip(var_set_end, b_bin)})
-    print(restrict_dict)
+        if past_var is not None:
 
-    # See if node a can reach node b in 5 steps
+            # TODO: Fix problem with compose_dict
+            compose_dict = {c:d for c, d in zip(past_var, curr_var)}
+            new_comp = rr.compose(compose_dict)
+
+            if hh is None: hh = new_comp
+            else: hh &= new_comp
+
+            # Remove quantifiers
+            hh = hh.smoothing({sv for sv in curr_var})
+
+        past_var = curr_var
+
+    # Compute restrict dictionary
+    restrict_dict = {c:d for c, d in zip(var_set_start, to_bin(a, k))}
+    restrict_dict.update({c:d for c, d in zip(var_set_end, to_bin(b, k))})
+    print("restrict_dict", restrict_dict)
+
+    # See if node a can reach node b in given steps
     reachable = hh.restrict(restrict_dict)
     return reachable
 
-
-    # TODO: Remove lower stuff
-
-    xx1, xx2, yy1, yy2, zz1, zz2 = map(bddvar, ["v0", "v1", "v2", "v3", "v4", "v5"])
-
-    # Two step reachability
-    hh = rr.compose({yy1:zz1, yy2:zz2}) & rr.compose({xx1:zz1, xx2:zz2})
-    hh = hh.smoothing({zz1, zz2})
-
-    a_bin = to_bin(a, k)
-    b_bin = to_bin(b, k)
-
-    restrict_dict_a = {c:d for c, d in zip(var_set_start, a_bin)}
-    restrict_dict_b = {c:d for c, d in zip(var_set_end, b_bin)}
-
-    # See if node a can reach node b in 5 steps
-    reachable = hh.restrict({xx1:1, xx2:1, yy1:0, yy2:0})
-
-    return reachable
-
 def to_bin(num, k):
-    node_bin = "{0:0b}".format(n)
+    node_bin = "{0:0b}".format(num)
     node_bin = "0" * (k - len(node_bin)) + node_bin
     return [int(x) for x in node_bin]
