@@ -39,7 +39,7 @@ def bdd_file_parse(f):
         if rr is None: rr = expr2bdd(r)
         else: rr = rr | expr2bdd(r)
 
-    return rr, expr_var_names
+    return rr, k
 
 def edge_expr(edge_nodes, k, expr_var_names):
     """

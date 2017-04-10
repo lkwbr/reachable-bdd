@@ -22,10 +22,10 @@ def main():
 
     # Handle incoming BDD file, constructing if there
     if len(sys.argv) < 2: raise TypeError("No BDD graph file passed!")
-    rr, expr_var_names = bdd_file_parse(sys.argv[1])
+    rr, k = bdd_file_parse(sys.argv[1])
 
     # See if given vertices are reachable in five steps
-    reachable = five_step_reach(rr, 1, 0, expr_var_names)
+    reachable = five_step_reach(rr, 1, 0, k)
     print(reachable)
 
 # Let's go
