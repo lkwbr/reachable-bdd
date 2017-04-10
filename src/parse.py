@@ -5,15 +5,16 @@ from pyeda.boolalg.expr import exprvar
 from functools import reduce
 import math
 
+var_id = 0
+
 def bdd_file_parse(f):
     """
     Parse given file f, assuming it is in the correct BDD format;
     Translating graph edges to Boolean formulas and BDDs
     """
 
+    # Parse all edge node numbers
     with open(f) as bdd_file:
-
-        # Parse all edge node numbers
         edge_nodes = list(map(lambda x: list(map(int, x.split())), \
             bdd_file.readlines()))
 
@@ -27,10 +28,24 @@ def bdd_file_parse(f):
     print(n, k)
 
     # Convert each number to binary
-    binary_nodes = list(map(lambda x: binary_vector(x, k), edge_nodes))
+    edge_expressions = list(map(lambda x: binary_vector(x, k), edge_nodes))
     print(binary_nodes)
 
-    # TODO: here
+    # Connect all the expressions and create a bdd
+    rr = None
+    r = None
+    for re in edge_expressions:
+
+        # Update relation
+        if r is None: r = re
+        else: r |= re
+
+        # Update BDD
+        rr = expr2bdd(r)
+
+    return rr
+
+    # TODO: Remove below, as this is outdated
 
     x1, x2, y1, y2, z1, z2 = map(exprvar, 'abcdef')
 
@@ -52,33 +67,36 @@ def bdd_file_parse(f):
 
     return rr
 
-def binary_vector(x, k):
+def binary_vector(edge_nodes, k):
     """
     Convert decimal number 10 into binary vector, e.g., 3 to [0, 0, 1, 1] for
-    x = 3, k = 4
+    x = 3, k = 4, where x is in edge_nodes
     """
 
-    # Two nodes connected by edge
-    node_list = [n for n in x]
+    global var_id
 
-    # Get binary of number for each node
-    node_binary_list = []
+    # For each node of edge, convert each bit to a BDD variable in an expression
     r = None
-    for n in node_list:
+    for n in edge_nodes:
+
         node_bin = "{0:0b}".format(n)
         node_bin = "b" + "0" * (k - len(node_bin)) + node_bin
-        print(node_bin)
+        node_bin_list = list(node_bin)
 
-        node_expr_var = exprvar(node_bin)
+        for node_var_str in node_bin_list
 
-        if r is None: r = node_expr_var
-        else: r &= node_expr_var
+            print(node_var_str)
 
-        #bin_vect = [int(v) for v in list("{0:0b}".format(n))]
-        #bin_vect = [0] * (k - len(bin_vect)) + bin_vect
-        #node_binary_list.append(bin_vect)
+            # Give each variable a unique name, "#[unique num]"
+            uniq_var_id = "#" + str(var_id)
+            var_id += 1
 
-    a = exprvar("".join(bin_node))
-    expr_vect = []
+            # Create variable from bit
+            node_var = exprvar(uniq_var_id)
+            if node_var_str == "0": node_var = ~node_var
 
-    return bin_vect
+            # Update the edge relation
+            if r is None: r = node_expr_var
+            else: r &= node_expr_var
+
+    return r
