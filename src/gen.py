@@ -15,23 +15,16 @@ def generate_graph(n, fn):
     with open(fn, "w+") as f:
 
         # (1) Connect every node to an edge
-        # (2) With the leftover allotted edges, randomly connect nodes
-
         node_list = list(range(n))
         random.shuffle(node_list)
-        print("Adding essential edges", n)
         for i in range(0, n, 2):
-
             u, v = (node_list[i], node_list[i + 1])
-
             edge = "{} {}".format(v, u)
             print(edge, file = f)
 
+        # (2) With the leftover allotted edges, randomly connect nodes
         remaining_nodes = m - n
-        print("Adding remaining edges", remaining_nodes)
         for i in range(0, remaining_nodes):
-
             u, v = (random.randint(0, n), random.randint(0, n))
-
             edge = "{} {}".format(v, u)
             print(edge, file = f)

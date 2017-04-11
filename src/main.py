@@ -15,7 +15,7 @@ from pyeda.boolalg.expr import exprvar
 
 # Custom libs
 from parse import bdd_file_parse
-from reach import five_step_reach
+from reach import num_step_reach
 from gen import generate_graph
 
 # Custom graph params
@@ -34,13 +34,19 @@ def main():
     if len(sys.argv) < 2:
         graph_file = __custom_graph_file_loc
         generate_graph(__custom_graph_len, graph_file)
+        print("Generated random BDD with {} nodes".format(__custom_graph_len))
     else: graph_file = sys.argv[1]
     rr, k = bdd_file_parse(graph_file)
+    print("Done parsing BDD file ")
 
     # See if given vertices are reachable in five steps
-    target_vertices = (3, 1)
-    reachable = five_step_reach(rr, *target_vertices, k)
-    print(target_vertices, reachable)
+    target_vertices = (3, 0)
+    num_steps = 5
+    print("Determine reachability of {} in {} steps".format(target_vertices, \
+        num_steps))
+    reachable = num_step_reach(rr, *target_vertices, k, num_steps)
+    if bool(reachable): print("Reachable!")
+    else: print("Unreachable!")
 
 # Let's go
 main()

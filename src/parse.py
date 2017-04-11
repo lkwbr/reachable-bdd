@@ -15,8 +15,6 @@ def bdd_file_parse(f):
 
     global __edge_expressions
 
-    # TODO: Do divide and conquer
-
     # Parse all edge node numbers
     with open(f) as bdd_file:
         edge_nodes = list(map(lambda x: list(map(int, x.split())), \
@@ -39,21 +37,10 @@ def bdd_file_parse(f):
 
     # Divide and conquer
     rr = recursive_build(0, len(__edge_expressions) - 1)
-    return rr
-
-    # Connect all the expressions and create a bdd
-    rr = None
-    i = 0
-    for r in edge_expressions:
-        if rr is None: rr = expr2bdd(r)
-        else: rr = rr | expr2bdd(r)
-
-        print("{}/{}".format(i, len(edge_expressions)))
-        i += 1
-
     return rr, k
 
 def recursive_build(a, b):
+    """ Recursively create BDD from edge expressions """
 
     if a == b:
         r = __edge_expressions[a]
