@@ -16,6 +16,12 @@ from pyeda.boolalg.expr import exprvar
 # Custom libs
 from parse import bdd_file_parse
 from reach import five_step_reach
+from gen import generate_graph
+
+# Custom graph params
+custom_graph_len = 1024
+graph_folder = "graphs"
+custom_graph_file_loc = "{}/{}_custom.graph".format(graph_folder, custom_graph_len)
 
 def main():
     """
@@ -23,9 +29,13 @@ def main():
     "./main.py [some_bdd_file_path]"
     """
 
-    # Handle incoming BDD file, constructing if there
-    if len(sys.argv) < 2: raise TypeError("No BDD graph file passed!")
-    rr, k = bdd_file_parse(sys.argv[1])
+    # Handle incoming BDD file, constructing if there; otherwise,
+    # randomly generate graph of predefined size
+    if len(sys.argv) < 2:
+        graph_file = custom_graph_file_loc
+        generate_graph(custom_graph_len, graph_file)
+    else: graph_file = sys.argv[1]
+    rr, k = bdd_file_parse(graph_file)
 
     # See if given vertices are reachable in five steps
     target_vertices = (3, 1)

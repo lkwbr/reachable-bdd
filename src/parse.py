@@ -11,6 +11,8 @@ def bdd_file_parse(f):
     translating graph edges to Boolean formulas and BDDs
     """
 
+    # TODO: Do divide and conquer
+
     # Parse all edge node numbers
     with open(f) as bdd_file:
         edge_nodes = list(map(lambda x: list(map(int, x.split())), \
@@ -25,15 +27,23 @@ def bdd_file_parse(f):
     k = math.ceil(math.log(n, 2))
 
     # Convert each number to binary
-    expr_var_names = ["v{}".format(i) for i in range(2 * k)] # for two nodes
+    expr_var_names_xx = ["xx{}".format(i) for i in range(k)]
+    expr_var_names_yy = ["yy{}".format(i) for i in range(k)]
+    expr_var_names = expr_var_names_xx + expr_var_names_yy
     edge_expressions = list(map(lambda x: edge_expr(x, k, expr_var_names), \
         edge_nodes))
 
+    print(len(edge_expressions))
+
     # Connect all the expressions and create a bdd
     rr = None
+    i = 0
     for r in edge_expressions:
         if rr is None: rr = expr2bdd(r)
         else: rr = rr | expr2bdd(r)
+
+        print("{}/{}".format(i, len(edge_expressions)))
+        i += 1
 
     return rr, k
 
