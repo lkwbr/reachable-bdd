@@ -5,11 +5,15 @@ from pyeda.boolalg.expr import exprvar
 from functools import reduce
 import math
 
+__edge_expressions = []
+
 def bdd_file_parse(f):
     """
     Parse given file f, assuming it is in the correct BDD format;
     translating graph edges to Boolean formulas and BDDs
     """
+
+    global __edge_expressions
 
     # TODO: Do divide and conquer
 
@@ -30,10 +34,12 @@ def bdd_file_parse(f):
     expr_var_names_xx = ["xx{}".format(i) for i in range(k)]
     expr_var_names_yy = ["yy{}".format(i) for i in range(k)]
     expr_var_names = expr_var_names_xx + expr_var_names_yy
-    edge_expressions = list(map(lambda x: edge_expr(x, k, expr_var_names), \
+    __edge_expressions = list(map(lambda x: edge_expr(x, k, expr_var_names), \
         edge_nodes))
 
-    print(len(edge_expressions))
+    # Divide and conquer
+    rr = recursive_build(0, len(__edge_expressions) - 1)
+    return rr
 
     # Connect all the expressions and create a bdd
     rr = None
@@ -46,6 +52,15 @@ def bdd_file_parse(f):
         i += 1
 
     return rr, k
+
+def recursive_build(a, b):
+
+    if a == b:
+        r = __edge_expressions[a]
+        return expr2bdd(r)
+
+    split_index = math.floor((b + a) / 2)
+    return recursive_build(a, split_index) | recursive_build(split_index + 1, b)
 
 def edge_expr(edge_nodes, k, expr_var_names):
     """
