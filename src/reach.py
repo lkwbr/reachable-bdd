@@ -3,6 +3,7 @@
 from pyeda.boolalg.bdd import (bddvar, expr2bdd, bdd2expr)
 from pyeda.boolalg.expr import exprvar
 from multiprocessing.pool import ThreadPool
+import time
 
 def num_step_reach(rr, a, b, k, num_steps = 5):
     """
@@ -11,8 +12,11 @@ def num_step_reach(rr, a, b, k, num_steps = 5):
     NOTE: Generalized because I wanted to
     """
 
+    # Time this function
+    start_time = time.time()
+
     # Help us divide and conquer with multiple threads
-    pool = ThreadPool(processes = 1)
+    pool = ThreadPool(processes = 2)
 
     # Create our BDD variables, matching those exactly in rr (except zz's)
     xx_list = [bddvar("xx{}".format(i)) for i in range(k)]
@@ -36,9 +40,10 @@ def num_step_reach(rr, a, b, k, num_steps = 5):
 
         # Conjunct them and do smoothing
         hh = (yyzz_compose & xxzz_compose).smoothing(set(zz_list))
-        
+
         print("\tComposed for step", i)
 
+    print("Completed in {} seconds".format(round(time.time() - start_time)))
     print("Number of satisfiable variables", len(list(hh.satisfy_all())))
 
     # See if a and b can reach eachother in the given number of steps

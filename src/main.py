@@ -19,7 +19,7 @@ from reach import num_step_reach
 from gen import generate_graph
 
 # Custom graph params
-__custom_graph_len = 1024
+__custom_graph_len = 64
 __graph_folder = "graphs"
 __custom_graph_file_loc = "{}/{}_custom.graph".format(__graph_folder, __custom_graph_len)
 
